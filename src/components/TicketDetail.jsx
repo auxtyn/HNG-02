@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getTicketById, deleteTicket } from '../utils/localStorage';
@@ -13,11 +13,7 @@ const TicketDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    loadTicket();
-  }, [id]);
-
-  const loadTicket = () => {
+  const loadTicket = useCallback(() => {
     const foundTicket = getTicketById(id);
     if (foundTicket) {
       // Check permissions
@@ -31,7 +27,11 @@ const TicketDetail = () => {
       setError('Ticket not found');
     }
     setLoading(false);
-  };
+  }, [id, user, hasPermission]);
+
+  useEffect(() => {
+    loadTicket();
+  }, [loadTicket]);
 
   const handleDelete = () => {
     if (deleteTicket(id)) {

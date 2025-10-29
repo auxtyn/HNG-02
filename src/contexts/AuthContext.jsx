@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 // Simple password hashing (not secure for production)
 const hashPassword = (password) => btoa(password);
@@ -148,10 +148,12 @@ export const AuthProvider = ({ children }) => {
 };
 
 // Custom hook to use Auth Context
-export const useAuth = () => {
+const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
+
+export { useAuth };

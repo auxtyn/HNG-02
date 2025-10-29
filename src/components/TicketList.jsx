@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getTickets, deleteTicket } from '../utils/localStorage';
@@ -15,15 +15,7 @@ const TicketList = () => {
 
   const { user, hasPermission } = useAuth();
 
-  useEffect(() => {
-    loadTickets();
-  }, []);
-
-  useEffect(() => {
-    applyFilters();
-  }, [tickets, filters]);
-
-  const loadTickets = () => {
+  const loadTickets = useCallback(() => {
     const allTickets = getTickets();
     // Filter tickets based on user role
     const userTickets = hasPermission('manageAllTickets')
@@ -31,9 +23,9 @@ const TicketList = () => {
       : allTickets.filter(ticket => ticket.createdBy === user.id || !ticket.createdBy);
 
     setTickets(userTickets);
-  };
+  }, [user, hasPermission]);
 
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     let filtered = [...tickets];
 
     if (filters.status) {
@@ -53,7 +45,15 @@ const TicketList = () => {
     }
 
     setFilteredTickets(filtered);
-  };
+  }, [tickets, filters]);
+
+  useEffect(() => {
+    loadTickets();
+  }, [loadTickets]);
+
+  useEffect(() => {
+    applyFilters();
+  }, [applyFilters]);
 
   const handleFilterChange = (e) => {
     setFilters({

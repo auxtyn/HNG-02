@@ -80,7 +80,7 @@ const TicketForm = ({ isEdit = false }) => {
           setError('Failed to create ticket');
         }
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred. Please try again.');
     }
 
