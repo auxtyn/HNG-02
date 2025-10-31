@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import ErrorBoundary from '../../components/ErrorBoundary'
@@ -12,7 +12,7 @@ const statusColors = {
 
 const TicketList = () => {
   const [tickets, setTickets] = useState([])
-  const [filteredTickets, setFilteredTickets] = useState([])
+  const [filtered, setFiltered] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [filters, setFilters] = useState({
@@ -27,7 +27,7 @@ const TicketList = () => {
         setLoading(true)
         const savedTickets = JSON.parse(localStorage.getItem('tickets') || '[]')
         setTickets(savedTickets)
-        setFilteredTickets(savedTickets)
+        setFiltered(savedTickets)
       } catch (err) {
         setError('Failed to load tickets')
         toast.error('Failed to load tickets')
@@ -40,31 +40,31 @@ const TicketList = () => {
   }, [])
 
   useEffect(() => {
-    let result = [...tickets]
+    let res = [...tickets]
 
     // Apply status filter
     if (filters.status !== 'all') {
-      result = result.filter(ticket => ticket.status === filters.status)
+      res = res.filter(t => t.status === filters.status)
     }
 
     // Apply search filter
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase()
-      result = result.filter(ticket => 
-        ticket.title.toLowerCase().includes(searchTerm) ||
-        ticket.description.toLowerCase().includes(searchTerm)
+      res = res.filter(t => 
+        t.title.toLowerCase().includes(searchTerm) ||
+        t.description.toLowerCase().includes(searchTerm)
       )
     }
 
     // Apply sorting
-    result.sort((a, b) => {
+    res.sort((a, b) => {
       if (filters.sortBy === 'newest') {
         return new Date(b.createdAt) - new Date(a.createdAt)
       }
       return new Date(a.createdAt) - new Date(b.createdAt)
     })
 
-    setFilteredTickets(result)
+    setFiltered(res)
   }, [tickets, filters])
 
   const handleDelete = (id) => {
@@ -73,7 +73,7 @@ const TicketList = () => {
         const updatedTickets = tickets.filter(ticket => ticket.id !== id)
         localStorage.setItem('tickets', JSON.stringify(updatedTickets))
         setTickets(updatedTickets)
-        setFilteredTickets(updatedTickets)
+        setFiltered(updatedTickets)
         toast.success('Ticket deleted successfully')
       } catch (error) {
         toast.error('Failed to delete ticket')
@@ -93,7 +93,7 @@ const TicketList = () => {
           <div className="flex flex-wrap gap-4">
             <select
               value={filters.status}
-              onChange={e => setFilters(prev => ({ ...prev, status: e.target.value }))}
+              onChange={e => setFilters(f => ({ ...f, status: e.target.value }))}
               className="border rounded px-3 py-2"
             >
               <option value="all">All Status</option>
@@ -102,21 +102,12 @@ const TicketList = () => {
               <option value="closed">Closed</option>
             </select>
 
-            <select
-              value={filters.sortBy}
-              onChange={e => setFilters(prev => ({ ...prev, sortBy: e.target.value }))}
-              className="border rounded px-3 py-2"
-            >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-            </select>
-
             <input
               type="text"
               placeholder="Search tickets..."
               value={filters.search}
-              onChange={e => setFilters(prev => ({ ...prev, search: e.target.value }))}
-              className="border rounded px-3 py-2"
+              onChange={e => setFilters(f => ({ ...f, search: e.target.value }))}
+              className="border rounded px-3 py-2 flex-1"
             />
 
             <Link
@@ -129,41 +120,21 @@ const TicketList = () => {
         </div>
 
         <div className="grid gap-4">
-          {filteredTickets.map(ticket => (
-            <div key={ticket.id} className="bg-white rounded-lg shadow p-6">
-              <div className="flex justify-between items-start">
+          {filtered.map(t => (
+            <div key={t.id} className="bg-white rounded-lg shadow p-6 card">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">{ticket.title}</h3>
-                  <p className="text-gray-600 mb-4">{ticket.description}</p>
-                  <span className={`px-3 py-1 rounded-full text-sm ${statusColors[ticket.status]}`}>
-                    {ticket.status.replace('_', ' ')}
-                  </span>
+                  <Link to={`/tickets/${t.id}`} className="no-underline" style={{ color: '#0f172a', fontWeight: 600 }}>{t.title}</Link>
+                  <div className="text-muted">{t.description}</div>
                 </div>
-                <div className="flex gap-2">
-                  <Link
-                    to={`/tickets/${ticket.id}/edit`}
-                    className="text-blue-500 hover:text-blue-700"
-                  >
-                    Edit
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(ticket.id)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    Delete
-                  </button>
+                <div>
+                  <span className={`badge ${t.status === 'open' ? 'badge-open' : t.status === 'in_progress' ? 'badge-in-progress' : 'badge-closed'}`}>{t.status.replace('_', ' ')}</span>
                 </div>
               </div>
             </div>
           ))}
 
-          {filteredTickets.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              {filters.search || filters.status !== 'all' ? 
-                'No tickets match your filters' : 
-                'No tickets found. Create your first ticket!'}
-            </div>
-          )}
+          {filtered.length === 0 && <div className="text-muted center card">No tickets found</div>}
         </div>
       </div>
     </ErrorBoundary>

@@ -52,27 +52,20 @@ function App() {
           } />
         </Route>
       </Routes>
-      <Toaster
+      <Toaster 
         position="top-right"
         toastOptions={{
-          className: 'text-sm',
-          duration: 5000,
-          style: {
-            background: '#fff',
-            color: '#363636',
-            borderRadius: '8px',
-            boxShadow: '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
-          },
+          duration: 4000,
           success: {
-            iconTheme: {
-              primary: '#059669',
-              secondary: '#fff',
+            style: {
+              background: '#10B981',
+              color: 'white',
             },
           },
           error: {
-            iconTheme: {
-              primary: '#dc2626',
-              secondary: '#fff',
+            style: {
+              background: '#EF4444',
+              color: 'white',
             },
           },
         }}

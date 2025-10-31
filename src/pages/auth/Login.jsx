@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import FormInput from '../../components/auth/FormInput'
+import toast from 'react-hot-toast'
 
 const Login = () => {
   const navigate = useNavigate()
@@ -18,8 +19,10 @@ const Login = () => {
     
     const result = await login(formData.username, formData.password)
     if (result.success) {
+      toast.success('Welcome back!')
       navigate('/dashboard')
     } else {
+      toast.error(result.error || 'Login failed')
       setErrors({ auth: result.error })
     }
   }
@@ -32,12 +35,12 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center">
-      <div className="max-w-md w-full p-6 bg-white rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+    <div className="login-container">
+      <div className="login-card">
+        <h2 className="login-title">Login</h2>
         
         {errors.auth && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
+          <div className="error-message">
             {errors.auth}
           </div>
         )}
@@ -63,10 +66,7 @@ const Login = () => {
             required
           />
 
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600"
-          >
+          <button type="submit" className="login-button btn">
             Login
           </button>
         </form>

@@ -1,53 +1,62 @@
-import { Link } from 'react-router-dom'
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import toast from 'react-hot-toast'
 
 const Navbar = () => {
   const { user, logout } = useAuth()
+  const navigate = useNavigate()
+  const [open, setOpen] = useState(false)
+
+  const handleLogout = () => {
+    logout()
+    toast.success('Logged out successfully')
+    navigate('/login')
+  }
 
   return (
-    <nav className="bg-white shadow">
+    <header className="navbar">
       <div className="mx-auto max-w-container px-4">
-        <div className="flex h-16 justify-between items-center">
-          <Link to="/" className="font-bold text-xl">
-            Ticket App
-          </Link>
-          
-          <div className="flex items-center gap-4">
+        <div className="nav-inner">
+          <Link to="/" className="nav-brand">Ticket App</Link>
+
+          <nav className="nav-links" role="navigation" aria-label="Primary">
+            <Link to="/dashboard" className="nav-link">Dashboard</Link>
+            <Link to="/tickets" className="nav-link">Tickets</Link>
+            <Link to="/about" className="nav-link">About</Link>
+          </nav>
+
+          <div className="auth-actions">
             {user ? (
               <>
-                <Link to="/dashboard" className="hover:text-blue-600">
-                  Dashboard
-                </Link>
-                <Link to="/tickets" className="hover:text-blue-600">
-                  Tickets
-                </Link>
-                <button
-                  onClick={logout}
-                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                >
-                  Logout
-                </button>
+                <button onClick={handleLogout} className="btn logout-btn">Logout</button>
               </>
             ) : (
               <>
-                <Link
-                  to="/login"
-                  className="text-gray-600 hover:text-blue-600"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                >
-                  Get Started
-                </Link>
+                <Link to="/login" className="nav-link">Login</Link>
+                <Link to="/register" className="btn btn-primary">Get Started</Link>
               </>
             )}
+
+            <button
+              className="mobile-menu-btn"
+              aria-label="Toggle menu"
+              onClick={() => setOpen(v => !v)}
+            >
+              ☰
+            </button>
           </div>
         </div>
+
+        {open && (
+          <div className="mobile-panel">
+            <Link to="/dashboard" onClick={() => setOpen(false)} className="mobile-link">Dashboard</Link>
+            <Link to="/tickets" onClick={() => setOpen(false)} className="mobile-link">Tickets</Link>
+            <Link to="/about" onClick={() => setOpen(false)} className="mobile-link">About</Link>
+          </div>
+        )}
       </div>
-    </nav>
+    </header>
   )
 }
 

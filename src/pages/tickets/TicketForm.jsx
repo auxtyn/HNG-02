@@ -113,7 +113,7 @@ const TicketForm = () => {
 
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="btn bg-blue-500 px-4 py-2 rounded hover:bg-blue-600"
         >
           {id ? 'Update Ticket' : 'Create Ticket'}
         </button>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import FormInput from '../../components/auth/FormInput'
+import toast from 'react-hot-toast'
 
 const Register = () => {
   const navigate = useNavigate()
@@ -19,13 +20,16 @@ const Register = () => {
 
     if (formData.password !== formData.confirmPassword) {
       setErrors({ confirmPassword: 'Passwords do not match' })
+      toast.error('Passwords do not match')
       return
     }
 
     const result = await register(formData.username, formData.password)
     if (result.success) {
+      toast.success('Registration successful! Welcome aboard!')
       navigate('/dashboard')
     } else {
+      toast.error(result.error || 'Registration failed')
       setErrors({ auth: result.error })
     }
   }
@@ -81,7 +85,7 @@ const Register = () => {
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600"
+            className="btn w-full bg-blue-500 p-3 rounded hover:bg-blue-600"
           >
             Register
           </button>
